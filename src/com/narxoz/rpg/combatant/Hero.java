@@ -82,7 +82,7 @@ public class Hero {
      * @param amount the damage to apply; must be non-negative
      */
     public void takeDamage(int amount) {
-        hp = Math.max(0, hp - amount);
+        hp = Math.max(0, hp - Math.max(0, amount));
     }
 
     /**
@@ -91,7 +91,7 @@ public class Hero {
      * @param amount the HP to restore; must be non-negative
      */
     public void heal(int amount) {
-        hp = Math.min(maxHp, hp + amount);
+        hp = Math.min(maxHp, hp + Math.max(0, amount));
     }
 
     /**
@@ -155,8 +155,15 @@ public class Hero {
      * @return a HeroMemento snapshot, or null in the scaffold
      */
     public HeroMemento createMemento() {
-        // TODO: capture the full mutable state into a HeroMemento.
-        return null;
+        return new HeroMemento(
+                name,
+                hp,
+                mana,
+                gold,
+                maxHp,
+                attackPower,
+                defense,
+                inventory.getArtifacts());
     }
 
     /**
@@ -165,7 +172,14 @@ public class Hero {
      * @param memento the snapshot to restore from
      */
     public void restoreFromMemento(HeroMemento memento) {
-        // TODO: read the snapshot and restore the hero's mutable state.
+        if (memento == null) {
+            return;
+        }
+
+        this.hp = memento.getHp();
+        this.mana = memento.getMana();
+        this.gold = memento.getGold();
+        this.inventory = new Inventory(memento.getInventorySnapshot());
     }
 
     @Override
@@ -177,6 +191,7 @@ public class Hero {
                 + ", gold=" + gold
                 + ", attackPower=" + attackPower
                 + ", defense=" + defense
+                + ", inventorySize=" + inventory.size()
                 + '}';
     }
 }
